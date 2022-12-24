@@ -10,7 +10,7 @@ import sys
 
 # Has to be run with admin permissions
 os.system('apt update')
-os.system('apt-get install -y nginx')
+# os.system('apt-get install -y nginx')
 os.system('mkdir /etc/nmm')
 
 if len(sys.argv) == 2 and sys.argv[1] == '--with-dep':
@@ -42,3 +42,6 @@ os.system('wget https://nginx.org/download/nginx-1.23.3.tar.gz --directory-prefi
 os.system('tar -xzvf /etc/nmm/nginx-1.23.3.tar.gz -C /etc/nmm')
 # os.system('rm /etc/nmm/nginx-1.23.3.zip')
 os.system('rm /etc/nmm/nginx-1.23.3.tar.gz')
+
+# Build
+os.system('cd /etc/nmm/nginx-1.23.3/ && ./configure && make && make install && cd /')

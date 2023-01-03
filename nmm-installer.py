@@ -8,40 +8,57 @@ import sys
 # |-- /nginx-x.y.z
 # |-- /modules
 
+# Compilation steps
+# Depencencies
+# apt install -y build-essential
+# apt install -y libpcre3 libpcre3-dev
+# apt install -y zlib1g zlib1g-dev
+# apt install -y wget unzip tar
+
+# OpenSSL
+# wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz --directory-prefix /etc/openssl
+# tar -xf /etc/openssl/openssl-1.1.1c.tar.gz -C /etc/openssl
+# rm /etc/openssl/openssl-1.1.1c.tar.gz
+# cd /etc/openssl/openssl-1.1.1c && ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib && make && make test && make install && cd /
+
+
+
 # Has to be run with admin permissions
 os.system('apt update')
-# os.system('apt-get install -y nginx')
+os.system('apt-get update')
+
+# NMM
+os.system('apt install -y build-essential')
+os.system('apt install -y libpcre3 libpcre3-dev')
+os.system('apt install -y zlib1g zlib1g-dev')
 os.system('mkdir /etc/nmm')
 
-if len(sys.argv) == 2 and sys.argv[1] == '--with-dep':
-    # Install nginx dependencies
-    # gcc make etc..
-    os.system('apt install -y build-essential')
-    # pcre library
-    os.system('apt install -y libpcre3 libpcre3-dev')
-    # zlib
-    os.system('apt install -y zlib1g zlib1g-dev')
+if '--includes' in sys.argv:
+    # nginx
+    os.system('apt install -y wget systemctl')
 
-    # Installing wget to get other files
-    os.system('apt install -y wget unzip tar')
+if '--latest-nginx' in sys.argv:
+    # change focal to bionic if ubuntu is < 20.04 
+    os.system('echo \'deb [arch=amd64] http://nginx.org/packages/mainline/ubuntu/ focal nginx\ndeb-src http://nginx.org/packages/mainline/ubuntu/ focal nginx\' > /etc/apt/sources.list.d/nginx.list')
 
-    # OpenSSL
-    os.system('wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz --directory-prefix /etc/openssl')
-    os.system('tar -xf /etc/openssl/openssl-1.1.1c.tar.gz -C /etc/openssl')
-    os.system('rm /etc/openssl/openssl-1.1.1c.tar.gz')
+    # update signature
+    os.system('wget http://nginx.org/keys/nginx_signing.key')
+    os.system('apt-key add nginx_signing.key')
 
-    os.system('cd /etc/openssl/openssl-1.1.1c && ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib && make && make test && make install && cd /')
+    # remove old nginx
+    os.system('apt remove nginx nginx-common nginx-full nginx-core')
 
-# Nginx source
-# https://nginx.org/download/nginx-x.y.z
+    # backup nginx configuration
+    os.system('cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak')
 
-# Downloading the zip, extracting it and deleting the zip
-# os.system('wget https://nginx.org/download/nginx-1.23.3.zip --directory-prefix /etc/nmm')
-os.system('wget https://nginx.org/download/nginx-1.23.3.tar.gz --directory-prefix /etc/nmm')
-# os.system('unzip /etc/nmm/nginx-1.23.3.zip -d /etc/nmm')
-os.system('tar -xzvf /etc/nmm/nginx-1.23.3.tar.gz -C /etc/nmm')
-# os.system('rm /etc/nmm/nginx-1.23.3.zip')
-os.system('rm /etc/nmm/nginx-1.23.3.tar.gz')
+    # install nginx
+    os.system('apt install -y nginx')
+elif '--install-nginx' in sys.argv:
+    os.system('apt-get install -y nginx')
 
-# Build
-os.system('cd /etc/nmm/nginx-1.23.3/ && ./configure && make && make install && cd /')
+if '--add-service' in sys.argv:
+    os.system('nginx -t')
+    os.system('systemctl start nginx')
+    os.system('systemctl enable nginx')
+    os.system('systemctl status nginx')
+

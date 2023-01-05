@@ -21,7 +21,35 @@ import sys
 # rm /etc/openssl/openssl-1.1.1c.tar.gz
 # cd /etc/openssl/openssl-1.1.1c && ./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl shared zlib && make && make test && make install && cd /
 
+# ============ # TEST # ============#
 
+# Work directory : /usr/lib/nmm
+#
+# ================================= #
+#         Update deb packages
+# ================================= #
+# Sources: 
+# https://www.nginx.com/blog/harnessing-power-convenience-of-javascript-for-each-request-with-nginx-javascript-module#njs-oss-load%22
+# https://onelinerhub.com/nginx/install-njs-nginx-javascript-module
+""" 
+apt install -y curl gnupg2 ca-certificates lsb-release debian-archive-keyring
+curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+apt update
+apt install -y nginx-module-njs
+"""
+# After the installation those lines need to be added to: /etc/nginx/nginx.conf
+"""
+load_module modules/ngx_http_js_module.so;
+load_module modules/ngx_stream_js_module.so;
+"""
+# Finally reopen it and reload
+"""
+service nginx start
+nginx -s reload
+"""
+
+# ============ # TEST # ============#
 
 # Has to be run with admin permissions
 os.system('apt update')
